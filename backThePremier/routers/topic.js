@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllTopics , getTopic,getSingleTopic,editTopic,deleteTopic,likeTopic,unLikeTopic} = require('../controllers/topic')
+const { getAllTopics , getTopic,getSingleTopic,editTopic,deleteTopic,likeTopic,unLikeTopic,addNewTopic,searchNewTopic,userSearchNewTopic} = require('../controllers/topic')
 const {checkTopicExist} = require("../controllers/middlewares/database/databaseErrorHelper");
 const {getAccessToRoute,getTopicOwnerAccess} = require('../controllers/middlewares/authorization/auth');
 
@@ -10,10 +10,15 @@ const message = require("./message")
 
 const router = express.Router();
 
+
 router.get("/:id/like",[getAccessToRoute,checkTopicExist],likeTopic)
 router.get("/:id/unlike",[getAccessToRoute,checkTopicExist],unLikeTopic)
 
 router.get('/',getAllTopics);
+router.post("/add",[getAccessToRoute],addNewTopic);
+router.post("/search",searchNewTopic);
+router.get("/search",userSearchNewTopic);
+
 router.get('/:id',checkTopicExist,getSingleTopic)
 router.post('/search',getTopic);
 router.put("/:id/edit",[getAccessToRoute,checkTopicExist,getTopicOwnerAccess],editTopic )

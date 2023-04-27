@@ -2,6 +2,7 @@ const User = require("../models/User");
 const CustomError = require('../helpers/errors/CustomError');
 const asyncErrorWrapper = require('express-async-handler');
 const Topic = require("../models/Topic");
+const Message = require("../models/Message")
 
 const getAllTopics = asyncErrorWrapper(async(req,res,next) =>{
 
@@ -19,9 +20,7 @@ query = query.where(searchObject);
 
     }
 
-    const topic = await query;
-
-    // const topic = await Subject.find().where({title: "Mongoose validate email Syntax"});
+    const topic = await query.populate("messages");
 
 
     return(
@@ -34,10 +33,139 @@ query = query.where(searchObject);
     
 });
 
+const addNewTopic = asyncErrorWrapper(async (req,res,next)=>{
+
+    
+ 
+    const information = req.body;
+
+
+    const existingTopic = await Topic.findOne({
+        title: { $regex: new RegExp(`^${information.title}$`, 'i') },
+      });
+      
+      if (existingTopic) {
+
+        console.log("Existing Topic vaaar ")
+        return res.status(200).json({
+          success: true,
+          message: 'Topic already exists',
+          data : existingTopic,
+        //   id:Topic._id
+
+        });
+      }
+
+
+    const topic = await Topic.create({
+        ...information,
+        user:req.user.id
+    });
+
+
+    res.status(200).json({
+        success: true,
+        data:topic
+
+    })
+
+
+
+
+})
+
+
+const searchNewTopic = asyncErrorWrapper(async (req,res,next)=>{
+
+    
+ 
+    const information = req.body;
+
+
+
+    const existingTopic = await Topic.findOne({
+        title: { $regex: new RegExp(`^${information.title}$`, 'i') },
+      }).populate('messages');
+      ;
+      
+      if (existingTopic) {
+
+ 
+        console.log("Existing Topic vaaar ");
+        console.log(existingTopic);
+        return res.status(200).json({
+          success: true,
+          message: 'Topic already exists',
+          data: existingTopic,
+          //   id:Topic._id
+
+        });
+      }
+
+
+      return res.status(200).json({
+        success: true,
+        data: 'No topic found',
+      });
+
+
+
+})
+const userSearchNewTopic = asyncErrorWrapper(async (req,res,next)=>{
+
+    
+ 
+
+    const query = req.query.q;
+
+
+    const existingTopic = await Topic.findOne({
+        title: { $regex: new RegExp(`^${query}$`, 'i') },
+      });
+      
+      if (existingTopic) {
+
+        const topic = await Topic.findOne({
+            title: { $regex: new RegExp(`^${query}$`, 'i') },
+          })
+          .populate({
+            path: "user",
+            select: "name profile_image",
+          })
+          .populate({
+            path: "messages",
+            select: "content user createdAt likes",
+            populate: {
+              path: "user",
+              select: "name profile_image",
+            },
+          });
+
+        console.log("Existing Topic vaaar ");
+        console.log(topic);
+        return res.status(200).json({
+          success: true,
+          message: 'Topic already exists',
+          data: topic,
+          //   id:Topic._id
+
+        });
+      }
+
+
+      return res.status(200).json({
+        success: true,
+        data: 'No topic found',
+      });
+
+
+
+})
+
 const getSingleTopic = asyncErrorWrapper(async(req,res,next) =>{
 
     const {id} = req.params;
-    const topic = await Subject.findById(id);
+    const topic = await Topic.findById(id);
 
     return(
     res
@@ -112,7 +240,7 @@ const likeTopic = asyncErrorWrapper(async(req,res,next) =>{
         return next(new CustomError("You have already like this topic",400));
     }
   
-    let topic = await Subject.findByIdAndUpdate(
+    let topic = await Topic.findByIdAndUpdate(
         id,
         { $addToSet: { likes: userId } },
         { new: true, runValidators: false, fields: { likes: 1 } }
@@ -163,4 +291,4 @@ const unLikeTopic = asyncErrorWrapper(async(req,res,next) =>{
 })
 
 
-module.exports = {getAllTopics,getTopic,getSingleTopic,editTopic,deleteTopic,likeTopic,unLikeTopic};
+module.exports = {getAllTopics,getTopic,getSingleTopic,editTopic,deleteTopic,likeTopic,unLikeTopic,addNewTopic,searchNewTopic,userSearchNewTopic};

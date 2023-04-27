@@ -13,7 +13,6 @@ const TopicSchema = new Schema({
     },
     content : {
         type:String,
-        required: [true,"Please provide a title"],
     },
 
     slug : String,

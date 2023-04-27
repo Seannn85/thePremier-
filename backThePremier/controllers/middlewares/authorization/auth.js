@@ -13,6 +13,7 @@ const Message = require("../../../models/Message");
 const getAccessToRoute = (req,res,next) =>{
     const { JWT_SECRET } = process.env;
 
+
     if(!isTokenIncluded(req)){
         return next(
             new CustomError("You are not authorized to access this route",401)
@@ -59,7 +60,7 @@ const getTopicOwnerAccess = asyncErrorWrapper(async (req, res, next) => {
     const topicId = req.params.id;
   
       
-  const subject = await Subject.findById(topicId)
+  const subject = await Topic.findById(topicId)
   
     if (subject.user != userId){
   

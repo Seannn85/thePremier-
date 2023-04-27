@@ -1,35 +1,34 @@
 
 import React from 'react';
-import { useGetTeamQuery } from './TeamApi';
+import { Routes, Route } from 'react-router-dom';
+import Register from './Page/Register';
 import Nav from './Page/Nav';
+
+import MainPage from './MainPage';
+
+
+
 
 
 function App() {
   
 
 
-  const { data, isLoading, error } = useGetTeamQuery();
-
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
 
   return (
-    <> 
-    
-    <div className='bg-slate-700 h-fit'>
-    <Nav/> 
-    <div className='border text-red-500'>
+    <>
+     
+      <Routes>
+      <Route path='/register' element={<Register />} />
+      <Route path='/' element={ <MainPage/>} />
 
      
-     
-      <h1>{data}</h1>
-      
-      </div>
-      </div>
-      </>
-  )
+    </Routes>
+    </>
+   
+  );
 }
+
+
 
 export default App

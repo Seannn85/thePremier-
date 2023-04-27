@@ -8,7 +8,7 @@ const {checkTopicAndMessageExist}= require("../controllers/middlewares/database/
 const {addNewMessageToTopic,getAllMessagesByTopic,getSingleMessage,editMessage,deleteMessage,likeMessage,unLikeMessage} = require('../controllers/message')
 router.post("/",getAccessToRoute,addNewMessageToTopic);
 
-router.get("/",getAllMessagesByTopic);
+router.get("/:slug/messages",getAllMessagesByTopic);
 router.get("/:message_id",checkTopicAndMessageExist, getSingleMessage);
 router.put("/:message_id/edit",[checkTopicAndMessageExist,getAccessToRoute,getMessageOwnerAccess], editMessage);
 router.get("/:message_id/like",[checkTopicAndMessageExist,getAccessToRoute], likeMessage);

@@ -6,7 +6,7 @@ const CustomError = require('../helpers/errors/CustomError');
 const asyncErrorWrapper = require('express-async-handler');
 
 const {sendJwtToClient} = require('../helpers/authorization/tokenHelpers');
-const {validateUserInput, comparePassword} = require('../helpers/input/inputHelpers');
+const {validateUserInput} = require('../helpers/input/inputHelpers');
 
 
 
@@ -24,23 +24,24 @@ const loginFunction =  asyncErrorWrapper(async (req, res, next) => {
   const user = await User.findOne({email}).select("+password");
 
   if (!user) {
-    return next(new CustomError("User not found", 404));
+    console.log("Error message:", "User not found Kral");
+
+return res.status(404).json({ message: "User not found Kral" });
+
+
   }
   
 
-  // const isMatch = await user.comparePasswords(password);
-  // console.log(isMatch);
-
-  if(!user.comparePassword(password,user.password)){
+  if(!user.comparePasswords(password,user.password)){
 
     return next(new CustomError("Please check your credentials, especially password",400))
   }
 
   sendJwtToClient(user,res)
 
-  console.log(user);
 
 });
+
 
 const errorTest = (req,res,next)=>{
 
