@@ -26,7 +26,7 @@ const checkUserExist = asyncErrorWrapper(async (req, res, next) => {
     const topic = await Topic.findById(topic_id);
   
     if(!topic){
-        return next(new CustomError("There is no such user with that id ",400));
+        return next(new CustomError("There is no such topic with that id ",400));
     }
   
     next();
