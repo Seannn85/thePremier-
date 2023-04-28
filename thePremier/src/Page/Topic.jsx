@@ -1,9 +1,8 @@
 
 
-import React, { useState, useEffect, useCallback,useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import Cookies from 'js-cookie';
-import { useGetTopicQuery, useWriteTopicMutation,useSearchTopicMutation,useGetMessagesByTopicSlugQuery } from '../TeamApi';
+import { useGetTopicQuery, useWriteTopicMutation,useSearchTopicMutation } from '../TeamApi';
 import Message from './Message';
 
 
@@ -28,7 +27,6 @@ const Topic = ({search}) => {
 
 
  
-  const titleRef = useRef();
 
 
 
@@ -43,7 +41,7 @@ const Topic = ({search}) => {
       try {
 
       
-        if (!search) {
+     
             
             const searchTopicData = await searchTopic({ title });
             setMessage(searchTopicData.data.messages);
@@ -52,26 +50,11 @@ const Topic = ({search}) => {
             // console.log(searchTopicData.data.messages[0].content)
             // console.log(messageByTopic)
            
-            }
-            
-
-            else {
-       
-        const topic = await writeTopic(
-          { title },
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get('access_token')}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
+console.log(searchTopicData)
    
-        setId(topic.data._id);
-        setSlug(topic.data.slug);
+        setId(searchTopicData);
 
-        setTitle('')}
+        setTitle('')
       } catch (err) {
         console.log(err);
       }
@@ -100,12 +83,12 @@ const Topic = ({search}) => {
 
   return (
     <>
-      {search &&  (<div className='text-white flex'>
+       <div className='text-white flex'>
         <div className='flex-1'>
           <ul>
             {topics.map((topic) => ( 
               <li key={topic._id}>
-                <Link onClick={() => setMessage(topic.messages)}>
+                <Link onClick={() => {setMessage(topic.messages); setTitle(topic.title)}}>
 {topic.title}</Link>
               </li>
 ))}
@@ -116,7 +99,6 @@ const Topic = ({search}) => {
             <input
               type='text'
               value={title}
-              ref = {titleRef}
               name='title'
               className='border text-black border-black'
               onChange={handleSearchChange}
@@ -127,51 +109,20 @@ const Topic = ({search}) => {
             </button>
           </form>
           <div className='mt-4'>
-            <Message topic_id={id} />
-          </div>
-        </div>
-      </div>)}
-
-     { !search  && (<div className='text-white flex'>
-        <div className='flex-1'>
-          <ul>
-            {topics.map((topic) => (
-              <li key={topic._id}>
-                   <Link onClick={() => setMessage(topic.messages)}>
-{topic.title}</Link>
-
-               
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className='flex-1'>
-          <form action='submit' onSubmit={handleSubmit}>
-            <input
-              type='text'
-              value={title}
-              name='title'
-              className='border text-black border-black'
-              onChange={handleSearchChange}
-              placeholder='Deger Gir'
-
-            />
-          <button className='text-white transition duration-300 ease-in-out hover:bg-gray-700'>
-          {/* to={`/search?q=${title}`}  */}
-          {/* onClick={(e) => handleClick(e, title)} */}
-              Search
-            </button>
-          </form>
-           <div className='mt-4'>
             {message?.map((singleMessage)=>(
     <ul>
         <li key={singleMessage._id}>{singleMessage.content}</li>
     </ul>
             ))}
           </div> 
-         
+          {search && <div className='mt-4'>
+            <Message topic_id={id} />
+          </div>}
         </div>
-      </div>) }
+      
+         
+      </div>
+
     </>
   );
 };

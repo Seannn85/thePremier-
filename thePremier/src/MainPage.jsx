@@ -29,7 +29,7 @@ function MainPage() {
   return (
     <div className='bg-slate-700 h-full flex flex-col'>
 
-    <Login getSearch={getSearch}/> 
+   { !search && <Login getSearch={getSearch}/> }
       <Nav />
       <br/>
       <br/>
