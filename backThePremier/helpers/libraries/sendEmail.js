@@ -1,10 +1,7 @@
 const sgMail = require('@sendgrid/mail');
 
-// sgMail.setApiKey("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");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 
-// This is my config.env file where i define SENDGRID_API_KEY:SENDGRID_API_KEY=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 .Why does this error message appear on the console? API key does not start with "SG.".
 
 
 
@@ -14,6 +11,9 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 
 const sendEmail = async (mailOptions) => {
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+
     try {
       await sgMail.send(mailOptions);
       console.log('Email sent successfully');
