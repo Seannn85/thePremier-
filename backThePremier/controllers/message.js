@@ -194,8 +194,9 @@ const likeMessage = asyncErrorWrapper(async(req,res,next) =>{
 
   
   try {
-    
+
   await like.save();
+
 
   return res.status(200).json({
           success: true,
@@ -213,7 +214,7 @@ const unLikeMessage = asyncErrorWrapper(async(req,res,next) =>{
 
 
   // const topic = await Topic.findById(id);
-  const message = await Topic.findById(message_id);
+  const message = await Message.findById(message_id);
   if(!message.likes.includes(req.user.id)){
       return next(new CustomError("You cannot undo like operation for this answer",400));
   }

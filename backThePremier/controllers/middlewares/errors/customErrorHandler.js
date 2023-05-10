@@ -29,7 +29,8 @@ const customErrorHandler = (err,req,res,next)=>{
     res.status(customError.status || 500)
     .json({
       success:false,
-      message: customError.message
+      message: customError.message,
+      error: customError
     })
   };
   

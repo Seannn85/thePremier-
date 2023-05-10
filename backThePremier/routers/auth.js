@@ -9,7 +9,7 @@ const profileImageUpload = require("../controllers/middlewares/libraries/profile
 router.post("/register",register);
 // router.post("/logout",logout);
 router.get("/profile",getAccessToRoute ,getUser);
-router.get("/logout",getAccessToRoute ,logout);
+router.post("/logout",getAccessToRoute ,logout);
 router.post("/login",loginFunction);
 router.put('/resetpassword',resetPassword)
 router.post("/upload",[getAccessToRoute,profileImageUpload.single("profile_image")],imageUpload);

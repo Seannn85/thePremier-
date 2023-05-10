@@ -13,21 +13,30 @@ const Message = require("../../../models/Message");
 const getAccessToRoute = (req,res,next) =>{
     const { JWT_SECRET } = process.env;
 
+    console.log('Checking if token is included in request headers...');
 
     if(!isTokenIncluded(req)){
+      console.log('Token not included in request headers!');
+
         return next(
             new CustomError("You are not authorized to access this route",401)
         );
     }
 
     const accessToken = getAccessTokenFromHeader(req);
+    console.log('Verifying access token...');
 
     jwt.verify(accessToken,JWT_SECRET,(err,decoded)=>{
         if(err){
+          console.log("Error verifying access token:", err);
+
             return next(
                 new CustomError("You are not authorized to access this route",401)
             )
         }
+
+        console.log('Access token verified successfully!');
+
 
         req.user = {
             id: decoded.id,

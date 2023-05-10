@@ -79,9 +79,18 @@ resetPasswordExpire: {
 blocked : {
     type : Boolean,
     default : false
+},
+
+resetPasswordToken:{
+    type: String
+},
+resetPasswordExpire:{
+    type: Date
 }
 
 });
+
+
 
 
 UserSchema.methods.generateJwtFromUser = function (){
