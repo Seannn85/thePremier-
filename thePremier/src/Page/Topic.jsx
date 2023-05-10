@@ -1,71 +1,55 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
+import {
+  useGetTopicQuery,
+  useWriteTopicMutation,
+  useSearchTopicMutation,
+} from "../TeamApi";
+import Message from "./Message";
+import { useSelector } from "react-redux";
+import LikeTopics from "./Helpers/LikeTopic";
+import UnLikeTopics from "./Helpers/UnLikeTopic";
 
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { useGetTopicQuery, useWriteTopicMutation,useSearchTopicMutation } from '../TeamApi';
-import Message from './Message';
-
-
-
-const Topic = ({search}) => {
-  const [title, setTitle] = useState('');
-  const [id, setId] = useState('');
+const Topic = () => {
+  const [title, setTitle] = useState("");
+  const [id, setId] = useState("");
   const { data: topics, isLoading, error, refetch } = useGetTopicQuery();
   const [writeTopic] = useWriteTopicMutation();
   const [searchTopic] = useSearchTopicMutation();
   const [slug, setSlug] = useState();
- 
 
-
-  const [message,setMessage] = useState()
-  const [messageByTopic,setMessageByTopic] = useState(false)
+  const [message, setMessage] = useState();
 
   const handleSearchChange = useCallback((event) => {
     setTitle(event.target.value);
-    
   }, []);
-
-
- 
-
-
-
 
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
-    //   const title = event.target.title.value;
+      //   const title = event.target.title.value;
 
-    // console.log(topics[0].messages[0].content)
-
+      // console.log(topics[0].messages[0].content)
       try {
+        const searchTopicData = await searchTopic({ title });
+        setMessage(searchTopicData.data.messages);
+        setSlug(searchTopicData.data.slug);
+        // console.log(title)
+        // console.log(searchTopicData.data.messages[0].content)
+        // console.log(messageByTopic)
 
-      
-     
-            
-            const searchTopicData = await searchTopic({ title });
-            setMessage(searchTopicData.data.messages);
-            setSlug(searchTopicData.data.slug);
-            // console.log(title)
-            // console.log(searchTopicData.data.messages[0].content)
-            // console.log(messageByTopic)
-           
-console.log(searchTopicData)
-   
-        setId(searchTopicData);
+        // console.log(searchTopicData.data.messages[0]._id)
 
-        setTitle('')
+        setId(searchTopicData.data._id);
+        console.log(searchTopicData.data.messages);
+
+        setTitle("");
       } catch (err) {
         console.log(err);
       }
     },
-    [writeTopic,searchTopic,title]
+    [writeTopic, searchTopic, title, message, id]
   );
-
-
-  
-
- 
 
   useEffect(() => {
     if (id) {
@@ -73,65 +57,57 @@ console.log(searchTopicData)
     }
   }, [id, refetch]);
 
-  
- 
-
-
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-
   return (
     <>
-       <div className='text-white flex'>
-        <div className='flex-1'>
+      <div className="flex text-white">
+        <div className="flex-1">
           <ul>
-            {topics.map((topic) => ( 
-              <li key={topic._id}>
-                <Link onClick={() => {setMessage(topic.messages); setTitle(topic.title)}}>
-{topic.title}</Link>
-              </li>
-))}
+            {topics.map((topic) => (
+              <div key={topic._id}>
+                <li>
+                  <Link
+                    onClick={() => {
+                      setMessage(topic.messages);
+                      setId(topic._id);
+                      setTitle(topic.title);
+                    }}
+                  >
+                    {topic.title}
+                  </Link>
+                </li>
+                <div className="flex space-x-5 items-center justify-center"> 
+                <LikeTopics id={topic._id} />
+                <UnLikeTopics id={topic._id} />
+                </div>
+              </div>
+            ))}
           </ul>
         </div>
-        <div className='flex-1'>
-          <form action='submit' onSubmit={handleSubmit}>
+        <div className="flex-1">
+          <form action="submit" onSubmit={handleSubmit}>
             <input
-              type='text'
+              type="text"
               value={title}
-              name='title'
-              className='border text-black border-black'
+              name="title"
+              className="border border-black text-black"
               onChange={handleSearchChange}
-              placeholder='Deger Gir'
+              placeholder="Deger Gir"
             />
-            <button  className='text-white transition duration-300 ease-in-out hover:bg-gray-700'>
+            <button className="text-white transition duration-300 ease-in-out hover:bg-gray-700">
               Search
             </button>
           </form>
-          <div className='mt-4'>
-            {message?.map((singleMessage)=>(
-    <ul>
-        <li key={singleMessage._id}>{singleMessage.content}</li>
-    </ul>
-            ))}
-          </div> 
-          {search && <div className='mt-4'>
-            <Message topic_id={id} />
-          </div>}
-        </div>
-      
-         
-      </div>
 
+          <div className="mt-4">
+            <Message topic_id={id} messages={message} />
+          </div>
+        </div>
+      </div>
     </>
   );
 };
 
 export default Topic;
-
-
-
-
-
-
-

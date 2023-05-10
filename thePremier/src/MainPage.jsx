@@ -1,50 +1,46 @@
+import React from "react";
+import { useState } from "react";
+import { useSelector } from 'react-redux';
 
-import React from 'react';
-import { useState } from 'react';
+
+import { useGetTeamQuery } from "./TeamApi";
+import Nav from "./Page/Nav";
+import Topic from "./Page/Topic";
+import Message from "./Page/Message";
+import Login from "./Page/Login";
+import Logout from "./Page/Logout";
+import Edit from "./Page/Edit";
 
 
-import { useGetTeamQuery } from './TeamApi';
-import Nav from './Page/Nav';
-import Topic from './Page/Topic';
-import Message from './Page/Message';
-import Login from './Page/Login';
 
+
+ 
 
 function MainPage() {
-
-  
-
   const { data, isLoading, error } = useGetTeamQuery();
-  const [search,setSearch] = useState(false)
+  const isLoggedin = useSelector((state) => state.auth.isLoggedin);
 
-
+ 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
-  console.log(data)
 
-
-  const getSearch = (param)=>  {
-    setSearch(param);
-  }
+ 
   return (
-    <div className='bg-slate-700 h-full flex flex-col'>
-
-   { !search && <Login getSearch={getSearch}/> }
+    <div className="flex h-full flex-col bg-slate-700">
+      {!isLoggedin && <Login />}
+      {isLoggedin && <Logout/> }
+      {isLoggedin && <Edit/> }
       <Nav />
-      <br/>
-      <br/>
-      <div className='flex-grow flex flex-row'>
-        <div className='w-1/4 bg-slate-700'>
-          <Topic search={search} />
+      <br />
+      <br />
+      <div className="flex flex-grow flex-row">
+        <div className="w-1/4 bg-slate-700">
+          <Topic />
         </div>
-        <div className='w-3/4 bg-slate-700flex flex-col-reverse'>
-          
-        </div>
+        <div className="bg-slate-700flex w-3/4 flex-col-reverse"></div>
       </div>
     </div>
   );
 }
 
-
-
-export default MainPage
+export default MainPage;

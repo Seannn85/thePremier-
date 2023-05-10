@@ -7,7 +7,9 @@ const asyncErrorWrapper = require('express-async-handler');
 
 const {sendJwtToClient} = require('../helpers/authorization/tokenHelpers');
 const {validateUserInput} = require('../helpers/input/inputHelpers');
+const sendEmail = require("../helpers/libraries/sendEmail");
 
+const noCache = require('nocache');
 
 
 
@@ -38,7 +40,6 @@ return res.status(404).json({ message: "User not found Kral" });
   }
 
   sendJwtToClient(user,res)
-
 
 });
 
@@ -76,7 +77,7 @@ const register = asyncErrorWrapper(async (req, res, next) => {
 const logout =  asyncErrorWrapper(async (req, res) => {
 
   const{NODE_ENV} = process.env
- 
+ console.log("Logout olup")
 return res
 .status(200)
 .cookie({
@@ -119,45 +120,45 @@ const forgotPassword = asyncErrorWrapper(async (req, res,next) => {
   await user.save();
 
   
-      res.status(200).json({
+    //   res.status(200).json({
+    //   success: true,
+    //   message: "Token sent to your email"
+    // })
+  
+
+
+  const resetPasswordUrl =`http://localhost:7000/api/auth/resetpassword?resetPasswordToken=${resetPasswordToken}`;
+
+  const emailTemplate = `
+  
+  <h3> Reset Your Password </h3>
+
+  <p> This <a href = '${resetPasswordUrl}' target = '_blank'>link</a> will expire in 1 hour </p>
+  
+  `;
+
+
+  try {
+    await sendEmail({
+      from: process.env.SENDGRID_EMAIL,
+      to : resetEmail,
+      subject: "Reset Your Password",
+      html: emailTemplate
+    })
+    return res.status(200).json({
       success: true,
       message: "Token sent to your email"
     })
   
+  }catch(err){
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
 
 
-  // const resetPasswordUrl =`http://localhost:5000/api/auth/resetpassword?resetPasswordToken=${resetPasswordToken}`;
-
-  // const emailTemplate = `
-  
-  // <h3> Reset Your Password </h3>
-
-  // <p> This <a href = '${resetPasswordUrl}' target = '_blank'>link</a> will expire in 1 hour </p>
-  
-  // `;
-
-
-  // try {
-  //   await sendEmail({
-  //     from:process.env.SMTP_USER,
-  //     to : resetEmail,
-  //     subject: "Reset your Password",
-  //     html: emailTemplate
-  //   })
-  //   res.status(200).json({
-  //     success: true,
-  //     message: "Token sent to your email"
-  //   })
-  
-  // }catch(err){
-  //   user.resetPasswordToken = undefined;
-  //   user.resetPasswordExpire = undefined;
-
-  //   await user.save();
-
-
-  //   return next(new CustomError("Email Could not be Sent",500));
-  // }
+    return next(new CustomError("Email Could not be Sent",500));
+  }
  
 })
 
@@ -194,6 +195,9 @@ const resetPassword = asyncErrorWrapper(async (req, res,next) => {
 })
 
 
+
+
+
 const editDetails = asyncErrorWrapper(async (req, res,next) => { 
 const editInformation = req.body;
 
@@ -205,7 +209,8 @@ const user = await User.findByIdAndUpdate(req.user.id,editInformation,{
 return res.status(200)
 .json({
   success:true,
-  data:user 
+  data:user,
+  message:"Yes Ortak"
 })
 
   
